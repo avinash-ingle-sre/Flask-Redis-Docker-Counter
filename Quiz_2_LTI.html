@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Specialist (P4) Quiz - Avinash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #0d47a1;
+            --bg-color: #f4f7f9;
+            --text-color: #333;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        h1 { color: var(--primary-color); margin-bottom: 5px; }
+        .instructions { background: #e3f2fd; padding: 15px; border-radius: 8px; font-size: 0.9em; margin-bottom: 25px; }
+
+        .question-card {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .question-text { font-weight: 600; margin-bottom: 12px; display: block; }
+
+        .options label {
+            display: block;
+            padding: 10px;
+            background: #fafafa;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .options label:hover { background: #eceff1; }
+        input[type="radio"] { margin-right: 10px; }
+
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-submit:hover { background: var(--secondary-color); }
+
+        #result-section {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .score-display { font-size: 2em; font-weight: bold; color: var(--primary-color); }
+        .analysis { margin-top: 15px; font-style: italic; line-height: 1.6; }
+        
+        .expert { background: #c8e6c9; border: 1px solid #4caf50; }
+        .strong { background: #fff9c4; border: 1px solid #fbc02d; }
+        .needs-improvement { background: #ffccbc; border: 1px solid #ff5722; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>SRE Specialist (P4) Mock Quiz</h1>
+        <p>LTIMindtree Interview Prep - Avinash Ingle</p>
+    </header>
+
+    <div class="instructions">
+        <strong>सूचना:</strong><br>
+        * या क्विझमध्ये एकूण ५० प्रश्न आहेत.<br>
+        * प्रत्येक अचूक उत्तराला १ गुण मिळेल.<br>
+        * शेवटी तुमचे गुण आणि विश्लेषण (Result Analysis) मिळेल.
+    </div>
+
+    <form id="quizForm">
+        <div id="quiz-container">
+            </div>
+        <button type="button" class="btn-submit" onclick="showResults()">निकाल पहा (Show Result)</button>
+    </form>
+
+    <div id="result-section">
+        <h3>तुमचा निकाल (Your Result)</h3>
+        <div class="score-display" id="finalScore"></div>
+        <div class="analysis" id="analysisText"></div>
+        <button onclick="location.reload()" style="margin-top:20px; padding:10px; cursor:pointer;">पुन्हा प्रयत्न करा</button>
+    </div>
+</div>
+
+<script>
+    // ५० प्रश्नांचा डेटा (नमुन्यासाठी महत्त्वाचे १० प्रश्न दिले आहेत, तुम्ही पूर्ण ५० इथे जोडू शकता)
+    const questions = [
+        { q: "SRE मध्ये 'Error Budget' चा मुख्य उद्देश काय आहे?", options: ["डेव्हलपर्सना शिक्षा करणे", "सिस्टम १००% अप ठेवणे", "वेग आणि स्थिरता यात समतोल साधणे", "खर्च कमी करणे"], ans: 2 },
+        { q: "पेमेंट गेटवेसाठी योग्य SLI कोणता?", options: ["CPU युटिलायझेशन", "तिकिटांची संख्या", "यशस्वी HTTP रिक्वेस्ट्सची टक्केवारी", "रॅम वापर"], ans: 2 },
+        { q: "९९.९% Availability म्हणजे महिन्यात किती डाउनटाइम मान्य आहे?", options: ["४३ मिनिटे", "४ मिनिटे", "८ तास", "५० मिनिटे"], ans: 0 },
+        { q: "Monitoring आणि Observability मध्ये मुख्य फरक काय?", options: ["दोन्ही एकच आहेत", "मॉनिटरिंग 'फेल' सांगते; ऑब्झर्व्हेबिलिटी 'का' सांगते", "मॉनिटरिंग स्वस्त असते", "काहीही नाही"], ans: 1 },
+        { q: "Prometheus प्रामुख्याने कोणत्या डेटासाठी वापरले जाते?", options: ["JSON लॉग्स", "Time-Series Metrics", "Tracing", "Text Logs"], ans: 1 },
+        { q: "बँकिंग लॉग्समध्ये सर्वात महत्त्वाची काळजी कोणती?", options: ["साईज कमी ठेवणे", "PII डेटा मास्क करणे", "S3 वर ठेवणे", "रिअल-टाइम पाहणे"], ans: 1 },
+        { q: "इन्सिडेंट दरम्यान 'Rollback' का केला जातो?", options: ["स्टोरेज वाचवण्यासाठी", "त्वरीत सेवा पूर्ववत करण्यासाठी (Mitigation)", "कोड डिलीट करण्यासाठी", "डेटाबेस अपडेट करण्यासाठी"], ans: 1 },
+        { q: "Terraform मध्ये State Locking का आवश्यक आहे?", options: ["खर्च वाचवण्यासाठी", "Race Condition टाळण्यासाठी", "वेग वाढवण्यासाठी", "पासवर्ड लपवण्यासाठी"], ans: 1 },
+        { q: "डेटाबेस कनेक्शन पूल एक्झॉस्ट होण्याचे मुख्य कारण काय?", options: ["नेटवर्क एरर", "कोडमध्ये कनेक्शन लीक असणे", "CPU हाय असणे", "युजर कमी असणे"], ans: 1 },
+        { q: "Chaos Engineering चा मुख्य उद्देश काय?", options: ["सिस्टमची रेझिलियन्स (सहनशक्ती) तपासणे", "बग्स शोधणे", "बिल कमी करणे", "हॅकिंग रोखणे"], ans: 0 }
+        // ... (अविनाश, मी इथे जागा वाचवण्यासाठी १० दिले आहेत, तू पूर्ण ५० जोडू शकतोस)
+    ];
+
+    const quizContainer = document.getElementById('quiz-container');
+
+    function renderQuiz() {
+        questions.forEach((item, index) => {
+            let html = `
+                <div class="question-card">
+                    <span class="question-text">${index + 1}. ${item.q}</span>
+                    <div class="options">
+                        ${item.options.map((opt, i) => `
+                            <label>
+                                <input type="radio" name="q${index}" value="${i}"> ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            quizContainer.innerHTML += html;
+        });
+    }
+
+    function showResults() {
+        let score = 0;
+        questions.forEach((item, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            if (selected && parseInt(selected.value) === item.ans) {
+                score++;
+            }
+        });
+
+        const resultSection = document.getElementById('result-section');
+        const scoreDisplay = document.getElementById('finalScore');
+        const analysisText = document.getElementById('analysisText');
+
+        resultSection.style.display = 'block';
+        scoreDisplay.innerText = `${score} / ${questions.length}`;
+
+        let total = questions.length;
+        let percentage = (score / total) * 100;
+
+        if (percentage >= 80) {
+            resultSection.className = 'expert';
+            analysisText.innerHTML = "<strong>Expert:</strong> तुमचे SRE कन्सेप्ट्स जबरदस्त आहेत! तुम्ही P4 लेव्हलसाठी पूर्णपणे तयार आहात.";
+        } else if (percentage >= 60) {
+            resultSection.className = 'strong';
+            analysisText.innerHTML = "<strong>Strong Candidate:</strong> तुमचा पाया भक्कम आहे, फक्त काही तांत्रिक गोष्टींवर लक्ष द्या.";
+        } else {
+            resultSection.className = 'needs-improvement';
+            analysisText.innerHTML = "<strong>Needs Improvement:</strong> तुम्हाला सखोल तयारीची गरज आहे. SRE बुक आणि ऑटोमेशनचा सराव करा.";
+        }
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    renderQuiz();
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRE Specialist P4 Full Quiz - 50 Questions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #1a237e; --secondary: #0d47a1; --bg: #f0f2f5; --white: #fff; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); padding: 10px; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; background: var(--white); padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        header { text-align: center; border-bottom: 3px solid var(--primary); margin-bottom: 20px; }
+        h1 { color: var(--primary); margin-bottom: 5px; font-size: 1.8em; }
+        .q-card { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 10px; transition: 0.3s; }
+        .q-card:hover { border-color: var(--primary); background: #f9f9f9; }
+        .q-text { font-weight: 600; font-size: 1.1em; display: block; margin-bottom: 10px; color: #333; }
+        .opt-label { display: block; padding: 12px; background: #fff; border: 1px solid #eee; margin-bottom: 8px; border-radius: 6px; cursor: pointer; }
+        .opt-label:hover { background: #e3f2fd; }
+        input[type="radio"] { margin-right: 10px; transform: scale(1.2); }
+        .sticky-footer { position: sticky; bottom: 0; background: var(--white); padding: 15px; border-top: 2px solid #eee; text-align: center; }
+        .btn { padding: 15px 40px; background: var(--primary); color: #fff; border: none; border-radius: 30px; font-size: 1.2em; cursor: pointer; font-weight: bold; width: 80%; }
+        #result { display: none; padding: 25px; border-radius: 10px; margin-top: 20px; text-align: center; }
+        .expert { background: #d4edda; color: #155724; }
+        .strong { background: #fff3cd; color: #856404; }
+        .weak { background: #f8d7da; color: #721c24; }
+        .score-num { font-size: 3em; font-weight: bold; display: block; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>SRE Specialist (P4) Master Quiz</h1>
+        <p>50 Scenario-based Questions for LTIMindtree Interview</p>
+    </header>
+
+    <form id="quizForm">
+        <div id="quiz-body"></div>
+        <div class="sticky-footer">
+            <button type="button" class="btn" onclick="calculateScore()">सबमिट करा आणि निकाल पहा</button>
+        </div>
+    </form>
+
+    <div id="result">
+        <h2>तुमचा निकाल (Analysis)</h2>
+        <span class="score-num" id="scoreValue">0 / 50</span>
+        <div id="analysisMsg" style="font-size: 1.2em; margin-top: 15px;"></div>
+        <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; cursor:pointer;">पुन्हा प्रयत्न करा</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        // Section A: SRE Fundamentals
+        { q: "SRE मध्ये 'Error Budget' चा मुख्य उद्देश काय?", options: ["शिक्षा करणे", "१००% अपटाइम", "वेग आणि स्थिरता यात समतोल", "खर्च कमी करणे"], ans: 2 },
+        { q: "पेमेंट गेटवेसाठी सर्वोत्तम SLI कोणता?", options: ["CPU वापर", "तिकिटांची संख्या", "यशस्वी ट्रॅन्झॅक्शनची टक्केवारी", "नेटवर्क स्पीड"], ans: 2 },
+        { q: "९९.९% Availability म्हणजे महिन्यात किती डाउनटाइम?", options: ["४३ मिनिटे", "४ मिनिटे", "८ तास", "५० मिनिटे"], ans: 0 },
+        { q: "टीमने एरर बजेट संपवल्यावर काय करावे?", options: ["डिप्लॉयमेंट थांबवून स्थिरता सुधारणे", "जास्त काम करणे", "SLO बदलणे", "AWS वाढवणे"], ans: 0 },
+        { q: "'Toil' म्हणजे काय?", options: ["कोडिंग", "मॅन्युअल, वारंवार होणारे काम", "डिझाइनिंग", "ट्रबलशूटिंग"], ans: 1 },
+        { q: "SRE आणि Ops मधील मुख्य फरक?", options: ["कोडिंगचा दृष्टिकोन", "पगार", "ऑफिस वेळ", "क्लाउड वापर"], ans: 0 },
+        { q: "Golden Signals मध्ये काय समाविष्ट नाही?", options: ["Latency", "Traffic", "Errors", "Cost"], ans: 3 },
+        { q: "Chaos Engineering कशासाठी आहे?", options: ["रेझिलियन्स तपासण्यासाठी", "बग्स शोधण्यासाठी", "खर्च वाचवण्यासाठी", "हॅकिंगसाठी"], ans: 0 },
+        { q: "Reliability म्हणजे काय?", options: ["कधीच फेल न होणे", "अपेक्षित वेळेत योग्य चालणे", "फास्ट असणे", "स्वस्त असणे"], ans: 1 },
+        { q: "Holistic Health म्हणजे काय?", options: ["फक्त सर्व्हर", "फक्त ॲप", "पूर्ण सिस्टम (Infra + App + User)", "फक्त DB"], ans: 2 },
+
+        // Section B: Observability
+        { q: "Monitoring vs Observability मधील मुख्य फरक?", options: ["काही नाही", "M: 'काय' घडले; O: 'का' घडले", "O स्वस्त आहे", "M जुने आहे"], ans: 1 },
+        { q: "Prometheus कोणत्या डेटासाठी आहे?", options: ["लॉग्स", "Time-Series Metrics", "Traces", "Images"], ans: 1 },
+        { q: "High Cardinality म्हणजे काय?", options: ["कमी डेटा", "खूप जास्त युनिक लेबल्स", "फास्ट डॅशबोर्ड", "नेटवर्क एरर"], ans: 1 },
+        { q: "Latency स्पाइक दिसल्यावर काय कराल?", options: ["रिस्टार्ट", "लॉग्स आणि ट्रेसेस तपासणे", "डिलीट", "DB वाढवणे"], ans: 1 },
+        { q: "Distributed Tracing कशासाठी वापरतात?", options: ["लॉग्ससाठी", "मायक्रोसर्व्हिसेसमधील रिक्वेस्ट ट्रॅक करण्यासाठी", "बॅकअपसाठी", "CPU चेकसाठी"], ans: 1 },
+        { q: "बँकिंग लॉग्समध्ये काय नसावे?", options: ["टाईमस्टॅम्प", "PII डेटा (अकाउंट नंबर इ.)", "एरर मेसेज", "सर्व्हर नाव"], ans: 1 },
+        { q: "Proactive Alerting चे उदाहरण कोणते?", options: ["डिस्क १००% भरल्यावर", "डिस्क ९०% भरल्यावर", "डिस्क भरण्याच्या वेगावरून आगाऊ सूचना", "काही नाही"], ans: 2 },
+        { q: "Logstash चे काम काय?", options: ["डिस्प्ले", "स्टोरेज", "लॉग्स गोळा करणे आणि पार्स करणे", "डिलीट"], ans: 2 },
+        { q: "Grafana DataSource म्हणजे काय?", options: ["Grafana चा डेटा", "Prometheus/DB सारखे बाह्य सोर्स", "युजर लिस्ट", "थीम"], ans: 1 },
+        { q: "AWS CloudWatch vs Prometheus?", options: ["CloudWatch मॅनेज्ड आहे", "दोन्ही एकच", "Prometheus महाग आहे", "CloudWatch फक्त DB साठी"], ans: 0 },
+        { q: "Alert Fatigue टाळण्याचा मार्ग?", options: ["सर्व बंद करणे", "फक्त 'Actionable' अलर्ट ठेवणे", "Slack वर सर्व पाठवणे", "थ्रेशोल्ड कमी करणे"], ans: 1 },
+        { q: "Executive Dashboard मध्ये काय हवे?", options: ["CPU ग्राफ", "एरर कोड", "High-level Business Metrics & SLO", "Pod Status"], ans: 2 },
+
+        // Section C: Incident Management
+        { q: "OutOfMemoryError आल्यावर पहिली कृती?", options: ["Heap Size वाढवणे", "RAM टाकणे", "Mitigation (Restart) + Heap Dump Analysis", "कडे लक्ष न देणे"], ans: 2 },
+        { q: "Connection Pool Exhaustion चे कारण?", options: ["स्लो इंटरनेट", "नेटवर्क", "Connection Leak (कोड)", "जास्त युजर्स"], ans: 2 },
+        { q: "Blameless Post-Mortem कशासाठी?", options: ["शिक्षा", "सिस्टममधील त्रुटी शोधून सुधारण्यासाठी", "वेळ वाचवण्यासाठी", "काही नाही"], ans: 1 },
+        { q: "CrashLoopBackOff साठी काय वापराल?", options: ["Delete", "Scale", "Describe & Logs", "Get Pods"], ans: 2 },
+        { q: "MTTR कमी करण्यासाठी काय कराल?", options: ["माणसे वाढवणे", "ऑटोमेशन (Self-healing)", "मीटिंग", "मॅन्युअल टेस्ट"], ans: 1 },
+        { q: "डिप्लॉयमेंट नंतर साइट स्लो झाल्यास?", options: ["जागे राहणे", "Rollback", "DNS बदलणे", "बॅकअप"], ans: 1 },
+        { q: "Capacity Planning कोणाचे काम?", options: ["फायनान्स", "SRE (Trend Analysis + Scalability)", "HR", "Sales"], ans: 1 },
+        { q: "Bottleneck शोधण्यासाठी AWS वर काय वापराल?", options: ["CloudTrail", "IAM", "X-Ray & CloudWatch", "S3"], ans: 2 },
+        { q: "Incident Commander चे काम?", options: ["कोड करणे", "समन्वय (Coordination) & स्पष्ट संवाद", "शांत बसणे", "मॅनेजरला चहा देणे"], ans: 1 },
+        { q: "5xx Errors + Target connection refused म्हणजे?", options: ["LB प्रॉब्लेम", "नेटवर्क", "बॅकएंड डाउन", "DB प्रॉब्लेम"], ans: 2 },
+        { q: "ServiceNow तिकीट ऑटोमेशन कसे कराल?", options: ["हाताने", "Webhook/API द्वारे", "Email", "शक्य नाही"], ans: 1 },
+        { q: "Runbook कशासाठी असते?", options: ["कोडिंग", "समस्या सोडवण्याच्या स्टेप्स (Manual)", "पगारासाठी", "नोटीस"], ans: 1 },
+
+        // Section D: Automation & IaC
+        { q: "Terraform State File कशासाठी?", options: ["कोड सेव्ह करणे", "रियल-वर्ल्ड मॅपिंग", "पासवर्ड", "काही नाही"], ans: 1 },
+        { q: "DynamoDB Locking कशासाठी?", options: ["एन्क्रिप्शन", "Race Condition टाळण्यासाठी", "स्वस्त", "फास्ट"], ans: 1 },
+        { q: "Idempotency म्हणजे काय?", options: ["एकदाच रन होणे", "पुन्हा पुन्हा चालवल्यावरही अंतिम परिणाम सारखाच", "फास्ट", "मल्टि-क्लाउड"], ans: 1 },
+        { q: "SRE पायथन कशासाठी वापरतात?", options: ["वेबसाइट", "Glue Code & Automation", "डिझाइन", "SQL"], ans: 1 },
+        { q: "Lambda Timeout सुधारण्यासाठी काय कराल?", options: ["व्हर्जन बदलणे", "Memory Allocation वाढवणे", "कोड कमी करणे", "S3 बदलणे"], ans: 1 },
+        { q: "Terraform vs Ansible?", options: ["Provisioning vs Config Mgmt", "दोन्ही एकच", "Ansible फक्त Linux", "TF फक्त AWS"], ans: 0 },
+        { q: "CI/CD मध्ये SRE चे काम?", options: ["कोड लिहिणे", "Reliable Pipelines & DevSecOps", "डिप्लॉय करणे", "काही नाही"], ans: 1 },
+        { q: "GitOps म्हणजे काय?", options: ["कन्सोलवरून बदल", "Git द्वारे इन्फ्रा बदलणे (ArgoCD)", "Email", "SSH"], ans: 1 },
+        { q: "Auto Scaling साठी फक्त CPU का नको?", options: ["उशीर होतो", "इतर बॉटलनेक्स (DB, Mem) असू शकतात", "महाग", "क्लिष्ट"], ans: 1 },
+        { q: "SSL रिन्यूअल ऑटोमेशन कसे कराल?", options: ["माणसे", "रिमाइंडर", "Cert-Manager", "काही नाही"], ans: 2 },
+
+        // Section E: Performance & Security
+        { q: "Load vs Stress Testing?", options: ["अपेक्षित लोड vs ब्रेकिंग पॉईंट", "एकच", "DB फक्त", "प्रॉड मध्ये"], ans: 0 },
+        { q: "Latency कमी करण्यासाठी बँकिंगमध्ये काय हवे?", options: ["ब्राउझर", "DB फक्त", "Multi-layer Caching (Redis, CDN)", "काही नाही"], ans: 2 },
+        { q: "SAST कधी करतात?", options: ["प्रॉड मध्ये", "बिल्ड दरम्यान (Static Analysis)", "डिप्लॉय नंतर", "ऑडिट वेळी"], ans: 1 },
+        { q: "Least Privilege Principle?", options: ["सर्व एक्सेस", "जेवढे आवश्यक तेवढेच", "पासवर्ड नको", "Root वापरणे"], ans: 1 },
+        { q: "प्रॉड DB एक्सेस कोणाकडे असावा?", options: ["सर्व", "SRE", "कोणाकडेच नाही", "मर्यादित (JIT Access + Audit)"], ans: 3 },
+        { q: "DDoS अटॅक वेळी काय वापराल?", options: ["सर्व बंद", "AWS WAF & Shield", "पोलिस", "कोड बदल"], ans: 1 }
+    ];
+
+    function renderQuiz() {
+        const body = document.getElementById('quiz-body');
+        quizData.forEach((item, i) => {
+            body.innerHTML += `
+                <div class="q-card">
+                    <span class="q-text">${i + 1}. ${item.q}</span>
+                    <div class="options">
+                        ${item.options.map((opt, idx) => `
+                            <label class="opt-label">
+                                <input type="radio" name="q${i}" value="${idx}"> ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function calculateScore() {
+        let score = 0;
+        quizData.forEach((item, i) => {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if (selected && parseInt(selected.value) === item.ans) score++;
+        });
+
+        document.getElementById('quizForm').style.display = 'none';
+        const resDiv = document.getElementById('result');
+        const scoreVal = document.getElementById('scoreValue');
+        const msg = document.getElementById('analysisMsg');
+
+        resDiv.style.display = 'block';
+        scoreVal.innerText = `${score} / 50`;
+
+        let percent = (score / 50) * 100;
+        if (percent >= 85) {
+            resDiv.className = 'expert';
+            msg.innerHTML = "<strong>EXPERT!</strong> तुम्ही P4 Specialist पदासाठी पूर्णपणे पात्र आहात. तुमचा कन्सेप्ट्सवर खूप चांगला ताबा आहे.";
+        } else if (percent >= 70) {
+            resDiv.className = 'strong';
+            msg.innerHTML = "<strong>STRONG!</strong> तुमची तयारी चांगली आहे. चुकलेल्या काही तांत्रिक प्रश्नांवर पुन्हा एकदा नजर टाका.";
+        } else {
+            resDiv.className = 'weak';
+            msg.innerHTML = "<strong>PREPARATION NEEDED!</strong> तुम्हाला SRE कन्सेप्ट्स आणि सिनिअरीओ बेस प्रश्नांवर अधिक सराव करण्याची गरज आहे.";
+        }
+        window.scrollTo(0,0);
+    }
+
+    renderQuiz();
+</script>
+</body>
+</html>
