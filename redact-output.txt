@@ -1,0 +1,28 @@
+{
+  "item": {
+    "value": "My email is [EMAIL_ADDRESS]"
+  },
+  "overview": {
+    "transformedBytes": "14",
+    "transformationSummaries": [
+      {
+        "infoType": {
+          "name": "EMAIL_ADDRESS",
+          "sensitivityScore": {
+            "score": "SENSITIVITY_MODERATE"
+          }
+        },
+        "transformation": {
+          "replaceWithInfoTypeConfig": {}
+        },
+        "results": [
+          {
+            "count": "1",
+            "code": "SUCCESS"
+          }
+        ],
+        "transformedBytes": "14"
+      }
+    ]
+  }
+}
