@@ -1,0 +1,8 @@
+{
+  "item": { "value": "Call me at (555) 123-4567" },
+  "inspectConfig": {
+    "infoTypes": [{ "name": "PHONE_NUMBER" }],
+    "minLikelihood": "POSSIBLE",
+    "includeQuote": true
+  }
+}
