@@ -98,3 +98,4 @@ Avinash Ingle | SRE & Cloud Engineer
 Google Cloud DLP Documentation
 
 DLP REST API Reference
+## 🔐 Security Note: Never hardcode sensitive data in your code!
